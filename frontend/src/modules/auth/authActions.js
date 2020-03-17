@@ -4,6 +4,7 @@ import Errors from 'modules/shared/error/errors';
 import Message from 'view/shared/message';
 import { i18n } from 'i18n';
 import { getHistory } from 'modules/store';
+import { AuthToken } from 'modules/auth/authToken';
 
 const prefix = 'AUTH';
 
@@ -25,9 +26,17 @@ const actions = {
   CURRENT_USER_REFRESH_SUCCESS: `${prefix}_CURRENT_USER_REFRESH_SUCCESS`,
   CURRENT_USER_REFRESH_ERROR: `${prefix}_CURRENT_USER_REFRESH_ERROR`,
 
+  PASSWORD_RESET_EMAIL_START: `${prefix}_PASSWORD_RESET_EMAIL_START`,
+  PASSWORD_RESET_EMAIL_SUCCESS: `${prefix}_PASSWORD_RESET_EMAIL_SUCCESS`,
+  PASSWORD_RESET_EMAIL_ERROR: `${prefix}_PASSWORD_RESET_EMAIL_ERROR`,
+
   PASSWORD_RESET_START: `${prefix}_PASSWORD_RESET_START`,
   PASSWORD_RESET_SUCCESS: `${prefix}_PASSWORD_RESET_SUCCESS`,
   PASSWORD_RESET_ERROR: `${prefix}_PASSWORD_RESET_ERROR`,
+
+  EMAIL_VERIFY_START: `${prefix}_EMAIL_VERIFY_START`,
+  EMAIL_VERIFY_SUCCESS: `${prefix}_EMAIL_VERIFY_SUCCESS`,
+  EMAIL_VERIFY_ERROR: `${prefix}_EMAIL_VERIFY_ERROR`,
 
   EMAIL_CONFIRMATION_START: `${prefix}_EMAIL_CONFIRMATION_START`,
   EMAIL_CONFIRMATION_SUCCESS: `${prefix}_EMAIL_CONFIRMATION_SUCCESS`,
@@ -62,53 +71,20 @@ const actions = {
 
   doSendPasswordResetEmail: (email) => async (dispatch) => {
     try {
-      dispatch({ type: actions.PASSWORD_RESET_START });
-      await service.sendPasswordResetEmail(email);
-      Message.success(i18n('auth.passwordResetEmailSuccess'));
-      dispatch({ type: actions.PASSWORD_RESET_SUCCESS });
-    } catch (error) {
-      Errors.handle(error);
-      dispatch({ type: actions.PASSWORD_RESET_ERROR });
-    }
-  },
-
-  doSigninSocial: (provider, rememberMe) => async (
-    dispatch,
-  ) => {
-    try {
-      dispatch({ type: actions.AUTH_START });
-
-      let authenticationUser = null;
-      let currentUser = null;
-
-      const credentials = await service.signinWithSocial(
-        provider,
-        rememberMe,
-      );
-
-      if (credentials && credentials.user) {
-        authenticationUser = credentials.user;
-        currentUser = await service.fetchMe();
-        currentUser.emailVerified =
-          authenticationUser.emailVerified;
-      }
-
-      // in background
-      service.reauthenticateWithStorageToken();
-
       dispatch({
-        type: actions.AUTH_SUCCESS,
-        payload: {
-          currentUser,
-          authenticationUser,
-        },
+        type: actions.PASSWORD_RESET_EMAIL_START,
+      });
+      await service.sendPasswordResetEmail(email);
+      Message.success(
+        i18n('auth.passwordResetEmailSuccess'),
+      );
+      dispatch({
+        type: actions.PASSWORD_RESET_EMAIL_SUCCESS,
       });
     } catch (error) {
-      await service.signout();
       Errors.handle(error);
-
       dispatch({
-        type: actions.AUTH_ERROR,
+        type: actions.PASSWORD_RESET_EMAIL_ERROR,
       });
     }
   },
@@ -119,22 +95,19 @@ const actions = {
     try {
       dispatch({ type: actions.AUTH_START });
 
-      const authenticationUser = await service.registerWithEmailAndPassword(
+      const token = await service.registerWithEmailAndPassword(
         email,
         password,
       );
-      const currentUser = await service.fetchMe();
-      currentUser.emailVerified =
-        authenticationUser.emailVerified;
 
-      // in background
-      service.reauthenticateWithStorageToken();
+      AuthToken.set(token, true);
+
+      const currentUser = await service.fetchMe();
 
       dispatch({
         type: actions.AUTH_SUCCESS,
         payload: {
           currentUser,
-          authenticationUser,
         },
       });
     } catch (error) {
@@ -159,30 +132,20 @@ const actions = {
     try {
       dispatch({ type: actions.AUTH_START });
 
-      let authenticationUser = null;
       let currentUser = null;
 
-      const credentials = await service.signinWithEmailAndPassword(
+      const token = await service.signinWithEmailAndPassword(
         email,
         password,
-        rememberMe,
       );
 
-      if (credentials && credentials.user) {
-        authenticationUser = credentials.user;
-        currentUser = await service.fetchMe();
-        currentUser.emailVerified =
-          authenticationUser.emailVerified;
-      }
-
-      // in background
-      service.reauthenticateWithStorageToken();
+      AuthToken.set(token, rememberMe);
+      currentUser = await service.fetchMe();
 
       dispatch({
         type: actions.AUTH_SUCCESS,
         payload: {
           currentUser,
-          authenticationUser,
         },
       });
     } catch (error) {
@@ -207,7 +170,6 @@ const actions = {
       dispatch({
         type: actions.AUTH_SUCCESS,
         payload: {
-          authenticationUser: null,
           currentUser: null,
         },
       });
@@ -220,27 +182,19 @@ const actions = {
     }
   },
 
-  doSigninFromAuthChange: (authenticationUser) => async (
-    dispatch,
-  ) => {
+  doInit: () => async (dispatch) => {
     try {
+      const token = await AuthToken.get();
       let currentUser = null;
 
-      if (authenticationUser) {
+      if (token) {
         currentUser = await service.fetchMe();
-
-        // in background
-        service.reauthenticateWithStorageToken();
-
-        currentUser.emailVerified =
-          authenticationUser.emailVerified;
       }
 
       dispatch({
         type: actions.AUTH_INIT_SUCCESS,
         payload: {
           currentUser,
-          authenticationUser: authenticationUser,
         },
       });
     } catch (error) {
@@ -263,15 +217,12 @@ const actions = {
         type: actions.CURRENT_USER_REFRESH_START,
       });
 
-      const authenticationUser = selectors.selectAuthenticationUser(
-        getState(),
-      );
-      const currentUser = await service.fetchMe();
-      currentUser.emailVerified =
-        authenticationUser.emailVerified;
+      let currentUser = null;
+      const token = await AuthToken.get();
 
-      // in background
-      service.reauthenticateWithStorageToken();
+      if (token) {
+        currentUser = await service.fetchMe();
+      }
 
       dispatch({
         type: actions.CURRENT_USER_REFRESH_SUCCESS,
@@ -320,6 +271,58 @@ const actions = {
       dispatch({
         type: actions.UPDATE_PROFILE_ERROR,
       });
+    }
+  },
+
+  doVerifyEmail: (token) => async (dispatch) => {
+    try {
+      dispatch({
+        type: actions.EMAIL_VERIFY_START,
+      });
+
+      await service.verifyEmail(token);
+
+      dispatch(actions.doRefreshCurrentUser());
+      Message.success(i18n('auth.verifyEmail.success'));
+      dispatch({
+        type: actions.EMAIL_VERIFY_SUCCESS,
+      });
+      getHistory().push('/');
+    } catch (error) {
+      Errors.handle(error);
+
+      dispatch({
+        type: actions.EMAIL_VERIFY_ERROR,
+      });
+      dispatch(actions.doSignout());
+      getHistory().push('/');
+    }
+  },
+
+  doResetPassword: (token, password) => async (
+    dispatch,
+  ) => {
+    try {
+      dispatch({
+        type: actions.PASSWORD_RESET_START,
+      });
+
+      await service.passwordReset(token, password);
+
+      Message.success(i18n('auth.passwordResetSuccess'));
+      dispatch({
+        type: actions.PASSWORD_RESET_SUCCESS,
+      });
+      getHistory().push('/');
+    } catch (error) {
+      Errors.handle(error);
+
+      dispatch({
+        type: actions.PASSWORD_RESET_ERROR,
+      });
+
+      dispatch(actions.doSignout());
+      getHistory().push('/');
     }
   },
 };

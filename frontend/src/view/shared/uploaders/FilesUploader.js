@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FileUploader from 'modules/shared/firebase/firebaseFileUploader';
+import FileUploader from 'modules/shared/fileUpload/fileUploader';
 import Errors from 'modules/shared/error/errors';
 import { i18n } from 'i18n';
 import AddIcon from '@material-ui/icons/Add';

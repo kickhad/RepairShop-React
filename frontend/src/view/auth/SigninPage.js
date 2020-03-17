@@ -23,7 +23,6 @@ import {
   Button,
   Tooltip,
 } from '@material-ui/core';
-import SocialButtons from 'view/auth/styles/SocialButtons';
 
 const { fields } = model;
 
@@ -53,11 +52,6 @@ class SigninPage extends Component {
 
   initialValues = () => {
     return { email: '', password: '', rememberMe: true };
-  };
-
-  doSigninWithSocial = (provider, rememberMe) => {
-    const { dispatch } = this.props;
-    dispatch(actions.doSigninSocial(provider, rememberMe));
   };
 
   doSubmit = ({ email, password, rememberMe }) => {
@@ -139,47 +133,6 @@ class SigninPage extends Component {
                 >
                   {i18n('auth.signin')}
                 </Button>
-
-                <SocialButtons>
-                  <Tooltip title="Facebook">
-                    <img
-                      src="/images/facebook.svg"
-                      alt="Facebook"
-                      onClick={() =>
-                        this.doSigninWithSocial(
-                          'facebook',
-                          form.values.rememberMe,
-                        )
-                      }
-                    />
-                  </Tooltip>
-
-                  <Tooltip title="Google">
-                    <img
-                      src="/images/google.svg"
-                      alt="Google"
-                      onClick={() =>
-                        this.doSigninWithSocial(
-                          'google',
-                          form.values.rememberMe,
-                        )
-                      }
-                    />
-                  </Tooltip>
-
-                  <Tooltip title="Twitter">
-                    <img
-                      src="/images/twitter.svg"
-                      alt="Twitter"
-                      onClick={() =>
-                        this.doSigninWithSocial(
-                          'twitter',
-                          form.values.rememberMe,
-                        )
-                      }
-                    />
-                  </Tooltip>
-                </SocialButtons>
 
                 <OtherActions>
                   <MaterialLink

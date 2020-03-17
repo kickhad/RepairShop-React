@@ -4,14 +4,24 @@
 
 const en = {
   app: {
-    title: 'Application'
+    title: 'Application',
   },
 
   auth: {
+    userDisabled: 'Your account is disabled',
+    userNotFound: `Sorry, we don't recognize your credentials`,
+    wrongPassword: `Sorry, we don't recognize your credentials`,
+    weakPassword: 'This password is too weak',
+    emailAlreadyInUse: 'Email is already in use',
+    invalidEmail: 'Please provide a valid email',
     passwordReset: {
+      invalidToken:
+        'Password reset link is invalid or has expired',
       error: `Email not recognized`,
     },
     emailAddressVerificationEmail: {
+      invalidToken:
+        'Email verification link is invalid or has expired',
       error: `Email not recognized`,
     },
   },

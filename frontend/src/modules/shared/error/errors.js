@@ -1,14 +1,10 @@
 import Message from 'view/shared/message';
 import { getHistory } from 'modules/store';
-import { i18n, i18nExists } from 'i18n';
+import { i18n } from 'i18n';
 
 const DEFAULT_ERROR_MESSAGE = i18n(
   'errors.defaultErrorMessage',
 );
-
-function isFirebaseAuthError(error) {
-  return error.code && error.code.startsWith('auth');
-}
 
 function selectErrorMessage(error) {
   if (error && error.response && error.response.data) {
@@ -21,24 +17,12 @@ function selectErrorMessage(error) {
     return String(data);
   }
 
-  if (isFirebaseAuthError(error)) {
-    if (i18nExists(`firebaseErrors.${error.code}`)) {
-      return i18n(`firebaseErrors.${error.code}`);
-    }
-
-    return DEFAULT_ERROR_MESSAGE;
-  }
-
   return error.message || DEFAULT_ERROR_MESSAGE;
 }
 
 function selectErrorCode(error) {
   if (error && error.response && error.response.status) {
     return error.response.status;
-  }
-
-  if (isFirebaseAuthError(error)) {
-    return 400;
   }
 
   return 500;

@@ -4,14 +4,24 @@
 
 const ptBR = {
   app: {
-    title: 'Aplicação'
+    title: 'Aplicação',
   },
 
   auth: {
+    userDisabled: 'Sua conta está desativada',
+    userNotFound: `Desculpe, não reconhecemos suas credenciais`,
+    wrongPassword: `Desculpe, não reconhecemos suas credenciais`,
+    weakPassword: 'Esta senha é muito fraca',
+    emailAlreadyInUse: 'O email já está sendo usado',
+    invalidEmail: 'Por favor forneça um email válido',
     passwordReset: {
+      invalidToken:
+        'Link de redefinição de senha inválido ou expirado',
       error: `Email não encontrado`,
     },
     emailAddressVerificationEmail: {
+      invalidToken:
+        'Link de verificação de email inválido ou expirado',
       error: `Email não encontrado`,
     },
   },

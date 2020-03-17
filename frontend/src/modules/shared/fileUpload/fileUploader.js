@@ -1,8 +1,9 @@
-import * as firebase from 'firebase/app';
-import 'firebase/storage';
 import * as uuid from 'uuid/v4';
 import { i18n } from 'i18n';
 import filesize from 'filesize';
+import { AuthToken } from 'modules/auth/authToken';
+import Axios from 'axios';
+import config from 'config';
 
 function extractExtensionFrom(filename) {
   if (!filename) {
@@ -55,38 +56,44 @@ export default class FileUploader {
 
     const extension = extractExtensionFrom(file.name);
     const id = uuid();
-    const ref = firebase.storage().ref();
-    const fullPath = `${path}/${id}.${extension}`;
-    const task = ref.child(fullPath).put(file);
+    const filename = `${id}.${extension}`;
+    const privateUrl = `${path}/${filename}`;
 
-    return new Promise((resolve, reject) => {
-      task.on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        (snapshot) => {},
-        (error) => {
-          reject(error);
-          return;
+    const publicUrl = await this.uploadToServer(
+      file,
+      path,
+      filename,
+    );
+
+    return {
+      id: id,
+      name: file.name,
+      sizeInBytes: file.size,
+      privateUrl,
+      publicUrl,
+      new: true,
+    };
+  }
+
+  static async uploadToServer(file, path, filename) {
+    const token = await AuthToken.get();
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('filename', filename);
+    await Axios.post(
+      `${config.backendUrl}/upload/${path}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          authorization: token ? `Bearer ${token}` : '',
         },
-        () => {
-          task.snapshot.ref
-            .getDownloadURL()
-            .then((url) => {
-              resolve({
-                id: id,
-                name: file.name,
-                sizeInBytes: task.snapshot.totalBytes,
-                privateUrl: fullPath,
-                publicUrl: url,
-                new: true,
-              });
-              return;
-            })
-            .catch((error) => {
-              reject(error);
-              return;
-            });
-        },
-      );
-    });
+      },
+    );
+
+    const privateUrl = `${path}/${filename}`;
+
+    return `${config.backendUrl}/download?privateUrl=${privateUrl}`;
   }
 }

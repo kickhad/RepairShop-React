@@ -1,4 +1,5 @@
-import { Button } from '@material-ui/core';
+import { Button, Container } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import SaveIcon from '@material-ui/icons/Save';
 import UndoIcon from '@material-ui/icons/Undo';
@@ -19,7 +20,10 @@ import CustomerAutocompleteFormItem from 'view/customer/autocomplete/CustomerAut
 import DeviceAutocompleteFormItem from 'view/device/autocomplete/DeviceAutocompleteFormItem';
 import CommentsAutocompleteFormItem from 'view/comments/autocomplete/CommentsAutocompleteFormItem';
 import ClaimsAutocompleteFormItem from 'view/claims/autocomplete/ClaimsAutocompleteFormItem';
-
+import CommentsListTable from 'view/comments/list/CommentsListTable';
+import CommentsListToolbar from 'view/comments/list/CommentsListToolbar';
+import CommentsListToolbarRepairOrder from 'view/comments/list/CommentsListToolbarRepairOrder'
+import Header from 'view/layout/Header';
 const { fields } = model;
 console.debug(fields);
 
@@ -85,11 +89,8 @@ class RepairOrderForm extends Component {
                   showCreate={!this.props.modal}
                   form={form}
                 />
-                <SwitchFormItem
-                  name={fields.delivered.name}
-                  label={fields.delivered.label}
-                />
-                <FilesFormItem
+    
+                {/* <FilesFormItem
                   name={fields.attachments.name}
                   label={fields.attachments.label}
                   required={fields.attachments.required}
@@ -99,15 +100,22 @@ class RepairOrderForm extends Component {
                     formats: fields.attachments.formats,
                   }}
                   max={fields.attachments.max}
-                />
-                <CommentsAutocompleteFormItem
+                /> */}
+                  
+                
+                  <CommentsListToolbarRepairOrder></CommentsListToolbarRepairOrder>
+                  <CommentsListTable
+                  >
+
+                  </CommentsListTable>
+                {/* <CommentsAutocompleteFormItem
                   name={fields.comments.name}
                   label={fields.comments.label}
                   required={fields.comments.required}
                   showCreate={!this.props.modal}
                   form={form}
                   mode="multiple"
-                />
+                /> */}
                 <ClaimsAutocompleteFormItem
                   name={fields.warrantyClaim.name}
                   label={fields.warrantyClaim.label}
@@ -116,7 +124,10 @@ class RepairOrderForm extends Component {
                   form={form}
                   mode="multiple"
                 />
-
+            <SwitchFormItem
+                  name={fields.delivered.name}
+                  label={fields.delivered.label}
+                />
                 <FormButtons
                   style={{
                     flexDirection: modal

@@ -3,6 +3,7 @@ const models = require('../models');
 const UserRoleRepository = require('./userRoleRepository');
 const FileRepository = require('./fileRepository');
 const AuditLogRepository = require('./auditLogRepository');
+const crypto = require('crypto');
 const SequelizeFilterUtils = require('../utils/sequelizeFilterUtils');
 
 const Sequelize = models.Sequelize;
@@ -91,6 +92,14 @@ module.exports = class UserRepository {
         email: data.email,
         firstName: data.firstName,
         authenticationUid: data.authenticationUid,
+        password: data.password,
+      },
+      { transaction },
+    );
+
+    await user.update(
+      {
+        authenticationUid: user.id,
       },
       { transaction },
     );
@@ -101,6 +110,7 @@ module.exports = class UserRepository {
       options,
     );
 
+    delete user.password;
     await AuditLogRepository.log(
       {
         entityName: 'user',
@@ -181,27 +191,32 @@ module.exports = class UserRepository {
   }
 
   /**
-   * Updates the Authentication provider UID
+   * Updates the password of the user.
    *
    * @param {*} id
-   * @param {*} authenticationUid
+   * @param {*} password
    * @param {*} [options]
    */
-  static async updateAuthenticationUid(
-    id,
-    authenticationUid,
-    options,
-  ) {
+  static async updatePassword(id, password, options) {
+    const currentUser = SequelizeRepository.getCurrentUser(
+      options,
+    );
+
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
     const user = await models.user.findByPk(id, {
-      transaction: SequelizeRepository.getTransaction(options),
+      transaction,
     });
 
     await user.update(
       {
-        authenticationUid,
-        updatedById: SequelizeRepository.getCurrentUser(options).id,
+        password,
+        authenticationUid: id,
+        updatedById: currentUser.id,
       },
-      { transaction: SequelizeRepository.getTransaction(options) },
+      { transaction },
     );
 
     await AuditLogRepository.log(
@@ -211,7 +226,7 @@ module.exports = class UserRepository {
         action: AuditLogRepository.UPDATE,
         values: {
           id,
-          authenticationUid,
+          authenticationUid: id,
         },
       },
       options,
@@ -220,6 +235,119 @@ module.exports = class UserRepository {
     return this.findById(user.id, options);
   }
 
+  /**
+   * Generates the email verification token.
+   *
+   * @param {*} email
+   * @param {*} [options]
+   */
+  static async generateEmailVerificationToken(
+    email,
+    options,
+  ) {
+    const currentUser = SequelizeRepository.getCurrentUser(
+      options,
+    );
+
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const user = await models.user.findOne(
+      {
+        where: { email },
+      },
+      {
+        transaction,
+      },
+    );
+
+    const emailVerificationToken = crypto
+      .randomBytes(20)
+      .toString('hex');
+    const emailVerificationTokenExpiresAt =
+      Date.now() + 360000;
+
+    await user.update(
+      {
+        emailVerificationToken,
+        emailVerificationTokenExpiresAt,
+        updatedById: currentUser.id,
+      },
+      { transaction },
+    );
+
+    await AuditLogRepository.log(
+      {
+        entityName: 'user',
+        entityId: user.id,
+        action: AuditLogRepository.UPDATE,
+        values: {
+          id: user.id,
+          emailVerificationToken,
+          emailVerificationTokenExpiresAt,
+        },
+      },
+      options,
+    );
+
+    return emailVerificationToken;
+  }
+
+  /**
+   * Generates the password reset token.
+   *
+   * @param {*} email
+   * @param {*} [options]
+   */
+  static async generatePasswordResetToken(email, options) {
+    const currentUser = SequelizeRepository.getCurrentUser(
+      options,
+    );
+
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const user = await models.user.findOne(
+      {
+        where: { email },
+      },
+      {
+        transaction,
+      },
+    );
+
+    const passwordResetToken = crypto
+      .randomBytes(20)
+      .toString('hex');
+    const passwordResetTokenExpiresAt = Date.now() + 360000;
+
+    await user.update(
+      {
+        passwordResetToken,
+        passwordResetTokenExpiresAt,
+        updatedById: currentUser.id,
+      },
+      { transaction },
+    );
+
+    await AuditLogRepository.log(
+      {
+        entityName: 'user',
+        entityId: user.id,
+        action: AuditLogRepository.UPDATE,
+        values: {
+          id: user.id,
+          passwordResetToken,
+          passwordResetTokenExpiresAt,
+        },
+      },
+      options,
+    );
+
+    return passwordResetToken;
+  }
 
   /**
    * Updates the status of the user: Disabled or Enabled.
@@ -650,6 +778,104 @@ module.exports = class UserRepository {
     });
 
     return users;
+  }
+
+  /**
+   * Finds the user by the password token if not expired.
+   *
+   * @param {*} token
+   * @param {*} [options]
+   */
+  static async findByPasswordResetToken(token, options) {
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const record = await models.user.findOne(
+      {
+        where: {
+          passwordResetToken: token,
+          passwordResetTokenExpiresAt: {
+            [models.Sequelize.Op.gt]: Date.now(),
+          },
+        },
+      },
+      { transaction },
+    );
+
+    return this._fillWithRelationsAndFiles(record, options);
+  }
+
+  /**
+   * Finds the user by the email verification token if not expired.
+   *
+   * @param {*} token
+   * @param {*} [options]
+   */
+  static async findByEmailVerificationToken(
+    token,
+    options,
+  ) {
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const record = await models.user.findOne(
+      {
+        where: {
+          emailVerificationToken: token,
+          emailVerificationTokenExpiresAt: {
+            [models.Sequelize.Op.gt]: Date.now(),
+          },
+        },
+      },
+      { transaction },
+    );
+
+    return this._fillWithRelationsAndFiles(record, options);
+  }
+
+  /**
+   * Marks the user email as verified.
+   *
+   * @param {*} id
+   * @param {*} [options]
+   */
+  static async markEmailVerified(id, options) {
+    const currentUser = SequelizeRepository.getCurrentUser(
+      options,
+    );
+
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const user = await models.user.findByPk(id, {
+      transaction,
+    });
+
+    await user.update(
+      {
+        emailVerified: true,
+        updatedById: currentUser.id,
+      },
+      { transaction },
+    );
+
+    await AuditLogRepository.log(
+      {
+        entityName: 'user',
+        entityId: user.id,
+        action: AuditLogRepository.UPDATE,
+        values: {
+          id,
+          emailVerified: true,
+        },
+      },
+      options,
+    );
+
+    return true;
   }
 
   /**

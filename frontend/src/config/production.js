@@ -1,14 +1,5 @@
-const firebaseConfig = <insert firebase config here>;
-
-// Cloud Functions
-const backendUrl = `https://us-central1-${
-  firebaseConfig.projectId
-}.cloudfunctions.net/api/api`;
-
-// App Engine
-// const backendUrl = `<insert app engine url here>`;
+const backendUrl = `/api`;
 
 export default {
-  firebaseConfig,
   backendUrl,
 };

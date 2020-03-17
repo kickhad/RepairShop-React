@@ -235,52 +235,6 @@ class DeviceRepository {
         };
       }
 
-      if (filter.serial) {
-        where = {
-          ...where,
-          [Op.and]: SequelizeFilterUtils.ilike(
-            'device',
-            'serial',
-            filter.serial,
-          ),
-        };
-      }
-
-      if (filter.orignalOrderNo) {
-        where = {
-          ...where,
-          [Op.and]: SequelizeFilterUtils.ilike(
-            'device',
-            'orignalOrderNo',
-            filter.orignalOrderNo,
-          ),
-        };
-      }
-
-      if (filter.purchaseDateRange) {
-        const [start, end] = filter.purchaseDateRange;
-
-        if (start !== undefined && start !== null && start !== '') {
-          where = {
-            ...where,
-            purchaseDate: {
-              ...where.purchaseDate,
-              [Op.gte]: start,
-            },
-          };
-        }
-
-        if (end !== undefined && end !== null && end !== '') {
-          where = {
-            ...where,
-            purchaseDate: {
-              ...where.purchaseDate,
-              [Op.lte]: end,
-            },
-          };
-        }
-      }
-
       if (filter.createdAtRange) {
         const [start, end] = filter.createdAtRange;
 

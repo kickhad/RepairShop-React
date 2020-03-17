@@ -19,6 +19,27 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.STRING(80),
         allowNull: true,
       },
+      password: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      emailVerified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      emailVerificationToken: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      emailVerificationTokenExpiresAt: {
+        type: DataTypes.DATE,
+      },
+      passwordResetToken: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      passwordResetTokenExpiresAt: { type: DataTypes.DATE },
       lastName: {
         type: DataTypes.STRING(175),
         allowNull: true,

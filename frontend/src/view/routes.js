@@ -191,7 +191,7 @@ const privateRoutes = [
   },
   {
     path: '/repair-order/:id/edit',
-    loader: () => import('view/repairOrder/form/RepairOrderFormPage'),
+    loader: () => import('view/repairOrder/form/RepairOrderFormPageSingle'),
     menu: false,
     permissionRequired: permissions.repairOrderEdit,
     exact: true,
@@ -352,6 +352,14 @@ const emailUnverifiedRoutes = [
 ];
 
 const simpleRoutes = [
+  {
+    path: '/auth/password-reset',
+    loader: () => import('view/auth/PasswordResetPage'),
+  },
+  {
+    path: '/auth/verify-email',
+    loader: () => import('view/auth/VerifyEmailPage'),
+  },
   {
     path: '/403',
     loader: () => import('view/shared/errors/Error403Page'),

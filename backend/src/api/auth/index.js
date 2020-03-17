@@ -1,4 +1,9 @@
 module.exports = (app) => {
+  app.put(
+    `/auth/password-reset`,
+    require('./authPasswordReset'),
+  );
+
   app.post(
     `/auth/send-email-address-verification-email`,
     require('./authSendEmailAddressVerificationEmail'),
@@ -9,9 +14,16 @@ module.exports = (app) => {
     require('./authSendPasswordResetEmail'),
   );
 
-  app.get(`/auth/storage-token`, require('./authStorageToken'));
+  app.post(`/auth/sign-in`, require('./authSignIn'));
+
+  app.post(`/auth/sign-up`, require('./authSignUp'));
 
   app.put(`/auth/profile`, require('./authUpdateProfile'));
+
+  app.put(
+    `/auth/verify-email`,
+    require('./authVerifyEmail'),
+  );
 
   app.get(`/auth/me`, require('./authMe'));
 

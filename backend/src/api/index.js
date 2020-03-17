@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const authFirebaseService = require('../auth/authFirebaseService');
 const authMiddleware = require('../auth/authMiddleware');
 const {
   init: databaseInit,
   middleware: databaseMiddleware,
 } = require('../database/databaseInit');
+const path = require('path');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
@@ -16,9 +17,6 @@ app.use(cors({ origin: true }));
 // Initializes and adds the database middleware.
 databaseInit().catch((error) => console.error(error));
 app.use(databaseMiddleware);
-
-// Initializes the authentication
-authFirebaseService.init();
 
 // Configures the authentication middleware
 // to set the currentUser to the requests
@@ -36,6 +34,7 @@ app.use(bodyParser.json());
 const routes = express.Router();
 require('./auditLog')(routes);
 require('./auth')(routes);
+require('./file')(routes);
 require('./iam')(routes);
 require('./settings')(routes);
 require('./customer')(routes);
@@ -47,5 +46,22 @@ require('./claims')(routes);
 
 // Add the routes to the /api endpoint
 app.use('/api', routes);
+
+// Exposes the build of the frontend
+// to the root / of the server
+const frontendDir = path.join(
+  __dirname,
+  '../../../frontend/build',
+);
+
+if (fs.existsSync(frontendDir)) {
+  app.use('/', express.static(frontendDir));
+
+  app.get('*', function(request, response) {
+    response.sendFile(
+      path.resolve(frontendDir, 'index.html'),
+    );
+  });
+}
 
 module.exports = app;

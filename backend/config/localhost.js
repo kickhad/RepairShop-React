@@ -1,3 +1,5 @@
+const os = require('os');
+
 module.exports = {
   env: 'localhost',
 
@@ -6,11 +8,12 @@ module.exports = {
    * More info: https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection
    */
   database: {
-    username: 'postgres',
-    dialect: 'postgres',
-    password: '',
-    database: 'development',
-    host: 'localhost',
+    username: 'npm',
+    dialect: 'mysql',
+    password: 'Mitchell1',
+    database: 'production',
+    host:
+      'localhost',
     logging: console.log,
   },
 
@@ -26,6 +29,17 @@ module.exports = {
   //   host: 'localhost',
   //   logging: console.log,
   // },
+
+  /**
+   * Secret used to Sign the JWT (Authentication) tokens.
+   */
+  authJwtSecret: '<place a generated random value here>',
+
+  /**
+   * Directory where uploaded files are saved.
+   * Default to temp.
+   */
+  uploadDir: os.tmpdir(),
 
   /**
    * Configuration to allow email sending used on:

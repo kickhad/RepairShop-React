@@ -1,27 +1,8 @@
-import * as firebase from 'firebase/app';
 import authAxios from 'modules/shared/axios/authAxios';
+import { AuthToken } from 'modules/auth/authToken';
 
 export default class AuthService {
-  static onAuthStateChanged(
-    callbackSuccess,
-    callbackError,
-  ) {
-    return firebase
-      .auth()
-      .onAuthStateChanged(callbackSuccess, callbackError);
-  }
-
-  static async sendEmailVerification(authenticationUser) {
-    if (await this.isEmailConfigured()) {
-      return this.sendEmailVerificationFromBackend();
-    }
-
-    return this.sendEmailVerificationFromClient(
-      authenticationUser,
-    );
-  }
-
-  static async sendEmailVerificationFromBackend() {
+  static async sendEmailVerification() {
     const response = await authAxios.post(
       '/auth/send-email-address-verification-email',
     );
@@ -29,21 +10,7 @@ export default class AuthService {
     return response.data;
   }
 
-  static async sendEmailVerificationFromClient(
-    authenticationUser,
-  ) {
-    return authenticationUser.sendEmailVerification();
-  }
-
   static async sendPasswordResetEmail(email) {
-    if (await this.isEmailConfigured()) {
-      return this.sendPasswordResetEmailFromBackend(email);
-    }
-
-    return this.sendPasswordResetEmailFromClient(email);
-  }
-
-  static async sendPasswordResetEmailFromBackend(email) {
     const response = await authAxios.post(
       '/auth/send-password-reset-email',
       {
@@ -54,56 +21,25 @@ export default class AuthService {
     return response.data;
   }
 
-  static async sendPasswordResetEmailFromClient(email) {
-    return firebase.auth().sendPasswordResetEmail(email);
-  }
-
   static async registerWithEmailAndPassword(
     email,
     password,
   ) {
-    const credentials = await firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password);
-    this.sendEmailVerification(credentials.user);
-    return credentials.user;
+    const response = await authAxios.post('/auth/sign-up', {
+      email,
+      password,
+    });
+
+    return response.data;
   }
 
-  static async signinWithSocial(
-    provider,
-    rememberMe = false,
-  ) {
-    const persistence = rememberMe
-      ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION;
+  static async signinWithEmailAndPassword(email, password) {
+    const response = await authAxios.post('/auth/sign-in', {
+      email,
+      password,
+    });
 
-    await firebase.auth().setPersistence(persistence);
-
-    const providers = {
-      google: firebase.auth.GoogleAuthProvider,
-      facebook: firebase.auth.FacebookAuthProvider,
-      twitter: firebase.auth.TwitterAuthProvider,
-    };
-
-    return firebase
-      .auth()
-      .signInWithPopup(new providers[provider]());
-  }
-
-  static async signinWithEmailAndPassword(
-    email,
-    password,
-    rememberMe = false,
-  ) {
-    const persistence = rememberMe
-      ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION;
-
-    await firebase.auth().setPersistence(persistence);
-
-    return firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password);
+    return response.data;
   }
 
   static async fetchMe() {
@@ -118,21 +54,8 @@ export default class AuthService {
     return response.data;
   }
 
-  static async reauthenticateWithStorageToken() {
-    try {
-      const response = await authAxios.get(
-        '/auth/storage-token',
-      );
-
-      const token = response.data;
-      return firebase.auth().signInWithCustomToken(token);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   static signout() {
-    return firebase.auth().signOut();
+    AuthToken.set(null, true);
   }
 
   static async updateProfile(
@@ -153,6 +76,29 @@ export default class AuthService {
     const response = await authAxios.put(
       '/auth/profile',
       body,
+    );
+
+    return response.data;
+  }
+
+  static async passwordReset(token, password) {
+    const response = await authAxios.put(
+      '/auth/password-reset',
+      {
+        token,
+        password,
+      },
+    );
+
+    return response.data;
+  }
+
+  static async verifyEmail(token) {
+    const response = await authAxios.put(
+      '/auth/verify-email',
+      {
+        token,
+      },
     );
 
     return response.data;

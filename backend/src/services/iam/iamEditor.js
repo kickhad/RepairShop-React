@@ -4,7 +4,6 @@ const ValidationError = require('../../errors/validationError');
 const SequelizeRepository = require('../../database/repositories/sequelizeRepository');
 const UserRepository = require('../../database/repositories/userRepository');
 const UserRoleRepository = require('../../database/repositories/userRoleRepository');
-const AuthFirebaseService = require('../../auth/authFirebaseService');
 
 /**
  * Handles the edition of the user(s) via the IAM page.
@@ -45,8 +44,6 @@ module.exports = class IamEditor {
 
       throw error;
     }
-
-    await this._updateAtAuthentication();
   }
 
   get _roles() {
@@ -90,18 +87,6 @@ module.exports = class IamEditor {
         transaction: this.transaction,
       },
     );
-  }
-
-  /**
-   * Updates the user at the auth provider.
-   */
-  async _updateAtAuthentication() {
-    if (this.user.authenticationUid) {
-      await AuthFirebaseService.updateUser(
-        this.user.authenticationUid,
-        this.user,
-      );
-    }
   }
 
   /**

@@ -1,11 +1,12 @@
 import actions from 'modules/auth/authActions';
 
 const initialData = {
-  authenticationUser: null,
   currentUser: null,
   loadingInit: true,
   loadingEmailConfirmation: false,
   loadingPasswordResetEmail: false,
+  loadingVerifyEmail: false,
+  loadingPasswordReset: false,
   loadingUpdateProfile: false,
   loading: false,
   errorMessage: null,
@@ -37,8 +38,6 @@ export default (state = initialData, { type, payload }) => {
   if (type === actions.AUTH_SUCCESS) {
     return {
       ...state,
-      authenticationUser:
-        payload.authenticationUser || null,
       currentUser: payload.currentUser || null,
       errorMessage: null,
       loading: false,
@@ -48,7 +47,6 @@ export default (state = initialData, { type, payload }) => {
   if (type === actions.AUTH_ERROR) {
     return {
       ...state,
-      authenticationUser: null,
       currentUser: null,
       errorMessage: payload || null,
       loading: false,
@@ -76,21 +74,21 @@ export default (state = initialData, { type, payload }) => {
     };
   }
 
-  if (type === actions.PASSWORD_RESET_START) {
+  if (type === actions.PASSWORD_RESET_EMAIL_START) {
     return {
       ...state,
       loadingPasswordResetEmail: true,
     };
   }
 
-  if (type === actions.PASSWORD_RESET_SUCCESS) {
+  if (type === actions.PASSWORD_RESET_EMAIL_SUCCESS) {
     return {
       ...state,
       loadingPasswordResetEmail: false,
     };
   }
 
-  if (type === actions.PASSWORD_RESET_ERROR) {
+  if (type === actions.PASSWORD_RESET_EMAIL_ERROR) {
     return {
       ...state,
       loadingPasswordResetEmail: false,
@@ -121,8 +119,6 @@ export default (state = initialData, { type, payload }) => {
   if (type === actions.AUTH_INIT_SUCCESS) {
     return {
       ...state,
-      authenticationUser:
-        payload.authenticationUser || null,
       currentUser: payload.currentUser || null,
       loadingInit: false,
     };
@@ -131,7 +127,6 @@ export default (state = initialData, { type, payload }) => {
   if (type === actions.AUTH_INIT_ERROR) {
     return {
       ...state,
-      authenticationUser: null,
       currentUser: null,
       loadingInit: false,
     };

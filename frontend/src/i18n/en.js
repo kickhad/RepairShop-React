@@ -505,7 +505,7 @@ const en = {
       title: 'Import Users',
       fileName: 'users_import_template',
       hint:
-        'Files/Images columns must be the URLs of the files separated by space.<br/> Relationships must be the ID of the referenced records separated by space.<br/> Roles must be the role ids separated by space.',
+        'Files/Images columns must be the URLs of the files separated by space. Relationships must be the ID of the referenced records separated by space. Roles must be the role ids separated by space.',
     },
     errors: {
       userAlreadyExists:
@@ -735,19 +735,6 @@ const en = {
   pagination: {
     labelDisplayedRows: '{0}-{1} of {2}',
     labelRowsPerPage: 'Per page:',
-  },
-
-  firebaseErrors: {
-    'auth/user-disabled': 'Your account is disabled',
-    'auth/user-not-found': `Sorry, we don't recognize your credentials`,
-    'auth/wrong-password': `Sorry, we don't recognize your credentials`,
-    'auth/weak-password': 'This password is too weak',
-    'auth/email-already-in-use': 'Email is already in use',
-    'auth/invalid-email': 'Please provide a valid email',
-    'auth/account-exists-with-different-credential':
-      'Email is already in use for a different authentication method.',
-    'auth/credential-already-in-use':
-      'Credentials are already in use',
   },
 };
 

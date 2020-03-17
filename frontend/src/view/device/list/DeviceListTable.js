@@ -127,27 +127,6 @@ class DeviceListTable extends Component {
                     name={fields.printerBrand.name}
                     label={fields.printerBrand.label}
                   />
-                  <TableCellCustom
-                    onSort={this.doChangeSort}
-                    hasRows={hasRows}
-                    sorter={sorter}
-                    name={fields.serial.name}
-                    label={fields.serial.label}
-                  />
-                  <TableCellCustom
-                    onSort={this.doChangeSort}
-                    hasRows={hasRows}
-                    sorter={sorter}
-                    name={fields.orignalOrderNo.name}
-                    label={fields.orignalOrderNo.label}
-                  />
-                  <TableCellCustom
-                    onSort={this.doChangeSort}
-                    hasRows={hasRows}
-                    sorter={sorter}
-                    name={fields.purchaseDate.name}
-                    label={fields.purchaseDate.label}
-                  />
                 <TableCellCustom size="md" />
               </TableRow>
             </TableHead>
@@ -189,21 +168,6 @@ class DeviceListTable extends Component {
                     <TableCell>
                       {fields.printerBrand.forView(
                         row[fields.printerBrand.name],
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {fields.serial.forView(
-                        row[fields.serial.name],
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {fields.orignalOrderNo.forView(
-                        row[fields.orignalOrderNo.name],
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {fields.purchaseDate.forView(
-                        row[fields.purchaseDate.name],
                       )}
                     </TableCell>
                     <TableCell>

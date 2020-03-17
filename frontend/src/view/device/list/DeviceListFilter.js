@@ -21,9 +21,6 @@ const { fields } = model;
 
 const schema = new FormFilterSchema([
   fields.printerBrand,
-  fields.serial,
-  fields.orignalOrderNo,
-  fields.purchaseDateRange,
 ]);
 
 class DeviceListFilter extends Component {
@@ -68,24 +65,6 @@ class DeviceListFilter extends Component {
                     <InputFormItem
                       name={fields.printerBrand.name}
                       label={fields.printerBrand.label}
-                    />
-                  </Grid>
-                  <Grid item lg={6} xs={12}>
-                    <InputFormItem
-                      name={fields.serial.name}
-                      label={fields.serial.label}
-                    />
-                  </Grid>
-                  <Grid item lg={6} xs={12}>
-                    <InputFormItem
-                      name={fields.orignalOrderNo.name}
-                      label={fields.orignalOrderNo.label}
-                    />
-                  </Grid>
-                  <Grid item lg={6} xs={12}>
-                    <DatePickerRangeFormItem
-                      name={fields.purchaseDateRange.name}
-                      label={fields.purchaseDateRange.label}
                     />
                   </Grid>
                 </Grid>

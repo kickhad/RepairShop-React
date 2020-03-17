@@ -508,7 +508,7 @@ const ptBR = {
       title: 'Importar Usuários',
       fileName: 'usuarios_template_importacao',
       hint:
-      'Arquivos/Imagens devem ser as URLs dos arquivos, separados por espaço.<br/> Relacionamentos devem ser os IDs separados por espaço.',
+      'Arquivos/Imagens devem ser as URLs dos arquivos, separados por espaço. Relacionamentos devem ser os IDs separados por espaço.',
     },
     errors: {
       userAlreadyExists: 'Usuário com este email já existe',
@@ -739,21 +739,6 @@ const ptBR = {
   pagination: {
     labelDisplayedRows: '{0}-{1} de {2}',
     labelRowsPerPage: 'Por página:',
-  },
-
-  firebaseErrors: {
-    'auth/user-disabled': 'Sua conta está desativada',
-    'auth/user-not-found': `Desculpe, não reconhecemos suas credenciais`,
-    'auth/wrong-password': `Desculpe, não reconhecemos suas credenciais`,
-    'auth/weak-password': 'Esta senha é muito fraca',
-    'auth/email-already-in-use':
-      'O email já está sendo usado',
-    'auth/invalid-email':
-      'Por favor forneça um email válido',
-    'auth/account-exists-with-different-credential':
-      'O email já está em uso para um método de autenticação diferente.',
-    'auth/credential-already-in-use':
-      'Credenciais já estão em uso',
   },
 };
 

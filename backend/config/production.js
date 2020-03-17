@@ -5,28 +5,40 @@ module.exports = {
    * PostgreSQL configuration for Sequelize.
    * More info: https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection
    */
-  database: {
-    username: 'postgres',
-    dialect: 'postgres',
-    password: '',
-    database: 'postgres',
-    host: 'postgres',
-    logging: console.log,
-  },
+  // database: {
+  //   username: 'postgres',
+  //   dialect: 'postgres',
+  //   password: '',
+  //   database: 'postgres1',
+  //   host: 'postgres',
+  //   logging: console.log,
+  // },
 
   /**
    * MySQL configuration for Sequelize.
    * More info: https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection
    */
-  // database: {
-  //   username: 'root',
-  //   dialect: 'mysql',
-  //   password: '',
-  //   database: 'production',
-  //   host:
-  //     '<insert public ip here>',
-  //   logging: console.log,
-  // },
+  database: {
+    username: 'npm',
+    dialect: 'mysql',
+    password: 'Mitchell1',
+    database: 'production',
+    host:
+      'localhost',
+    logging: console.log,
+  },
+
+  /**
+   * Secret used to Sign the JWT (Authentication) tokens.
+   */
+  authJwtSecret: '<place a generated random value here>',
+
+  /**
+   * Directory where uploaded files are saved.
+   * Default to the storage volume: /storage.
+   * See /docker-compose.yml
+   */
+  uploadDir: '/storage',
 
   /**
    * Configuration to allow email sending used on:
@@ -46,7 +58,7 @@ module.exports = {
   /**
    * Client URL used when sending emails.
    */
-  clientUrl: 'https://<insert project id here>.firebaseapp.com',
+  clientUrl: '<insert client url here>',
 
 
 };
