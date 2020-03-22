@@ -8,12 +8,11 @@ module.exports = {
    * More info: https://sequelize.org/v5/manual/getting-started.html#setting-up-a-connection
    */
   database: {
-    username: 'npm',
-    dialect: 'mysql',
-    password: 'Mitchell1',
-    database: 'production',
-    host:
-      'localhost',
+    username: 'postgres',
+    dialect: 'postgres',
+    password: '',
+    database: 'development',
+    host: 'localhost',
     logging: console.log,
   },
 

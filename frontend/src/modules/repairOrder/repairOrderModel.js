@@ -12,7 +12,7 @@ function label(name) {
 }
 
 const fields = {
-  id: new RelationToOneField('id', label('id')),
+  id: new IdField('id', label('id')),
   customer: new RelationToOneField('customer', label('customer'), {
     "required": true
   }),

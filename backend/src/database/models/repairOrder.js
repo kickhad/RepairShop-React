@@ -8,15 +8,9 @@ module.exports = function(sequelize, DataTypes) {
   const repairOrder = sequelize.define(
     'repairOrder',
     {
-      // id: {
-      //   type: DataTypes.UUID,
-      //   defaultValue: DataTypes.UUIDV4,
-      //   primaryKey: true,
-      // },
       id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        initialAutoIncrement: 1000,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       delivered: {

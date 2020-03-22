@@ -33,6 +33,6 @@
     "mocha": "6.2.2",
     "node-mocks-http": "1.8.0",
     "nodemon": "1.19.4",
-    "sequelize-cli": "^5.5.1"
+    "sequelize-cli": "5.5.1"
   }
 }

@@ -21,7 +21,6 @@ import CommentsAutocompleteFormItem from 'view/comments/autocomplete/CommentsAut
 import ClaimsAutocompleteFormItem from 'view/claims/autocomplete/ClaimsAutocompleteFormItem';
 
 const { fields } = model;
-console.debug(fields);
 
 class RepairOrderForm extends Component {
   schema = new FormSchema(fields.id, [

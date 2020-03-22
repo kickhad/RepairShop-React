@@ -191,7 +191,7 @@ const privateRoutes = [
   },
   {
     path: '/repair-order/:id/edit',
-    loader: () => import('view/repairOrder/form/RepairOrderFormPageSingle'),
+    loader: () => import('view/repairOrder/form/RepairOrderFormPage'),
     menu: false,
     permissionRequired: permissions.repairOrderEdit,
     exact: true,
